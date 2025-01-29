@@ -1,0 +1,6 @@
+.idea/
+go-grpc-tmpl/.vscode
+.DS_Store
+**/vendor
+prsnl-workspace.iml
+.vscode

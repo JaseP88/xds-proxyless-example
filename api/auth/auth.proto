@@ -1,0 +1,26 @@
+syntax = "proto3";
+option go_package = "/golang-grpc/auth";
+
+package auth;
+
+service Auth {  
+  rpc DualMessage (stream AuthRequest) returns (stream AuthResponse) {}
+  rpc DualMessageRequestResponse (AuthRequest) returns (AuthResponse) {}
+}
+
+message AuthRequest {
+  string from = 1;
+  Payload reqPayload = 2;
+  int64 transactionCounter = 3;
+}
+
+message AuthResponse {
+  string result = 1;
+  Payload resPayload = 2;
+}
+
+message Payload {
+  string currency = 1;
+  float amount = 2;
+  int64 accountNumber = 3;
+}
