@@ -30,7 +30,7 @@ import (
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	router "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/router/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
-	// tls "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
+	tls "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -52,36 +52,36 @@ const (
 )
 
 func makeCluster() *cluster.Cluster {
-	// tlsManager := &tls.UpstreamTlsContext{
-	// 	CommonTlsContext: &tls.CommonTlsContext{
-	// 		ValidationContextType: &tls.CommonTlsContext_CombinedValidationContext{
-	// 			CombinedValidationContext: &tls.CommonTlsContext_CombinedCertificateValidationContext{
-	// 				DefaultValidationContext: &tls.CertificateValidationContext{
-	// 					CaCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
-	// 						InstanceName: "my_custom_cert_provider",
-	// 					},
-	// 				},
-	// 			},
-	// 		},
-	// 		TlsCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
-	// 			InstanceName: "my_custom_cert_provider",
-	// 		},
-	// 	},
-	// }
+	tlsManager := &tls.UpstreamTlsContext{
+		CommonTlsContext: &tls.CommonTlsContext{
+			ValidationContextType: &tls.CommonTlsContext_CombinedValidationContext{
+				CombinedValidationContext: &tls.CommonTlsContext_CombinedCertificateValidationContext{
+					DefaultValidationContext: &tls.CertificateValidationContext{
+						CaCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
+							InstanceName: "my_custom_cert_provider",
+						},
+					},
+				},
+			},
+			TlsCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
+				InstanceName: "my_custom_cert_provider",
+			},
+		},
+	}
 
-	// tlsManagerAsAny, err := anypb.New(tlsManager)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	tlsManagerAsAny, err := anypb.New(tlsManager)
+	if err != nil {
+		panic(err)
+	}
 
 	return &cluster.Cluster{
 		Name: ClusterName,
-		// TransportSocket: &core.TransportSocket{
-		// 	Name: "envoy.transport_sockets.tls", // this is required, A29: if a transport_socket name is not envoy.transport_sockets.tls i.e. something we don't recognize, gRPC will NACK an LDS update
-		// 	ConfigType: &core.TransportSocket_TypedConfig{
-		// 		TypedConfig: tlsManagerAsAny,
-		// 	},
-		// },
+		TransportSocket: &core.TransportSocket{
+			Name: "envoy.transport_sockets.tls", // this is required, A29: if a transport_socket name is not envoy.transport_sockets.tls i.e. something we don't recognize, gRPC will NACK an LDS update
+			ConfigType: &core.TransportSocket_TypedConfig{
+				TypedConfig: tlsManagerAsAny,
+			},
+		},
 		ConnectTimeout:       durationpb.New(5 * time.Second),
 		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
 		EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{

@@ -1,9 +1,5 @@
 # XDS Control Plane
 
-### insecugit
-This branch is with tls off
-
-
 ## Overview 
 This project implements a functional xDS Control Plane using [proxyless GRPC](https://grpc.github.io/grpc/core/md_doc_grpc_xds_features.html) instead of sidecars with active weighted endpoint load-balancing.  
 The codebase is predominantly sourced from Envoy's [go-control-plane](https://github.com/envoyproxy/go-control-plane/tree/main) library.  
@@ -67,52 +63,52 @@ go run .
 ### scenarios
 This outlines the traffic split by percentage across all the grpc servers   
   
-***(1) initial state***  
+***(1) Initial State***  
 |  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
 |  ---------  |  ---------  |  ---------  |  ----------------  |
 |  90         |  5          |  5          |  0                 |
 
-***(2) change ClusterA weight to 0, change ClusterB weight to 100***  
+***(2) Remove ClusterA***  
 |  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
 |  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  50         |  50         |  0                 |
+|  X          |  50         |  50         |  0                 |
 
-***(3) remove ClusterB_2***  
-|  ClusterA   |  ClusterB_1 |  X          |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  100        |  0          |  0                 |
-
-***(4) remove ClusterB_1***  
-|  ClusterA   |  X          |  X          |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  100        |  0          |  0          |  0                 |
-
-***(5) remove ClusterA***  
-|  X          |  X          |  X          |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  0          |  0          |  100               |
-
-***(6) remove XDS***  
-|  X          |  X          |  X          |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  0          |  0          |  100               |
-
-***(7) restart ClusterA***  
-|  ClusterA   |  X          |  X          |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  100        |  0          |  0          |  0               |
-
-***(8) restart ClusterB_2***  
-|  ClusterA   |  X          |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  0         |  100         |  0                 |
-
-***(9) restart ClusterB_1***  
+***(3) Remove ClusterB_2***  
 |  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
 |  ---------  |  ---------  |  ---------  |  ----------------  |
-|  0          |  50         |  50         |  0                |
+|  X          |  100        |  X          |  0                 |
 
-***(10) restart XDS***  
+***(4) Remove ClusterB_1***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  X          |  X          |  X          |  100               |
+
+***(5) Update ClusterA weight to 10%, Update ClusterB weight to 90%***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  X          |  X          |  X          |  100               |
+
+***(6) Restart ClusterA***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  100        |  X          |  X          |  0                 |
+
+***(7) Restart ClusterB_1***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  10         |  90         |  X          |  0               |
+
+***(8) Restart ClusterB_2***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  10         |  45         |  45         |  0                 |
+
+***(9) Remove XDS***  
+|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
+|  ---------  |  ---------  |  ---------  |  ----------------  |
+|  10          |  45        |  45         |  0                |
+
+***(10) Restart XDS***  
 |  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
 |  ---------  |  ---------  |  ---------  |  ----------------  |
 |  90         |  5          |  5          |  0                 |

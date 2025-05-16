@@ -34,7 +34,7 @@ import (
 	xdscreds "google.golang.org/grpc/credentials/xds"
 	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-	// "google.golang.org/grpc/xds" // To install the xds resolvers and balancers.
+	"google.golang.org/grpc/xds" // To install the xds resolvers and balancers.
 )
 
 var (
@@ -48,7 +48,7 @@ var (
 func init() {
 	flag.StringVar(&address, "a", "127.0.0.1", "server address")
 	flag.IntVar(&port, "p", 50051, "the port to serve Greeter service requests on. Health service will be served on `port+1`")
-	flag.BoolVar(&xdsCreds, "xds_creds", false, "whether the server should use xDS APIs to receive security configuration")
+	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
 	flag.StringVar(&serverName, "n", "server_A", "server name")
 }
 
@@ -107,8 +107,8 @@ func main() {
 	}
 
 	// xdsclient within server
-	// as, err := xds.NewGRPCServer(grpc.Creds(creds))
-	as := grpc.NewServer(grpc.Creds(creds))
+	as, err := xds.NewGRPCServer(grpc.Creds(creds))
+	// as := grpc.NewServer(grpc.Creds(creds))
 	if err != nil {
 		log.Fatalf("Failed to create an auth gRPC server: %v", err)
 	}
