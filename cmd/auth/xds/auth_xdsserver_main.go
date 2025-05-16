@@ -47,7 +47,7 @@ func init() {
 	// ads
 	flag.BoolVar(&ads, "ads", false, "ads")
 	// tls
-	flag.BoolVar(&tls, "tls", true, "tls")
+	flag.BoolVar(&tls, "tls", false, "tls")
 }
 
 func main() {
@@ -57,10 +57,14 @@ func main() {
 	cache := cache.NewSnapshotCache(ads, cache.IDHash{}, l)
 
 	// Create the snapshot that we'll serve to Envoy
-	server1Snapshot := resources.GenerateSnapshotServerSnapshot("", 50051)
-	registerSnapshot(server1Snapshot, cache, "server1")
-	server2Snapshot := resources.GenerateSnapshotServerSnapshot("", 50053)
-	registerSnapshot(server2Snapshot, cache, "server2")
+	// server1Snapshot := resources.GenerateSnapshotServerSnapshot("", 50051)
+	// registerSnapshot(server1Snapshot, cache, "server1")
+	// server2Snapshot := resources.GenerateSnapshotServerSnapshot("", 50053)
+	// registerSnapshot(server2Snapshot, cache, "server2")
+	// server3Snapshot := resources.GenerateSnapshotServerSnapshot("", 50055)
+	// registerSnapshot(server3Snapshot, cache, "server3")
+	// server4Snapshot := resources.GenerateSnapshotServerSnapshot("", 50057)
+	// registerSnapshot(server4Snapshot, cache, "server4")
 	clientSnapshot := resources.GenerateSnapshotClientSnapshot("", 90, 10)
 	registerSnapshot(clientSnapshot, cache, "client123")
 

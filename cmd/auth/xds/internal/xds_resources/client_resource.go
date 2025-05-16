@@ -30,7 +30,7 @@ import (
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	router "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/router/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
-	tls "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
+	// tls "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -39,47 +39,49 @@ import (
 )
 
 const (
-	ClusterName        = "backend_cluster"
-	RouteName          = "local_route"
-	GrpcClientListener = "connect.me.to.grpcserver"
+	ClusterName         = "backend_cluster"
+	RouteName           = "local_route"
+	GrpcClientListener  = "connect.me.to.grpcserver"
 	GrpcServer1Listener = "example/resource/127.0.0.1:50051"
 	GrpcServer2Listener = "example/resource/127.0.0.1:50053"
-	UpstreamHost       = "127.0.0.1"
-	UpstreamPortA      = 50051
-	UpstreamPortB      = 50053
+	GrpcServer3Listener = "example/resource/127.0.0.1:50055"
+	GrpcServer4Listener = "example/resource/127.0.0.1:50057"
+	UpstreamHost        = "127.0.0.1"
+	UpstreamPortA       = 50051
+	UpstreamPortB       = 50053
 )
 
 func makeCluster() *cluster.Cluster {
-	tlsManager := &tls.UpstreamTlsContext{
-		CommonTlsContext: &tls.CommonTlsContext{
-			ValidationContextType: &tls.CommonTlsContext_CombinedValidationContext{
-				CombinedValidationContext: &tls.CommonTlsContext_CombinedCertificateValidationContext{
-					DefaultValidationContext: &tls.CertificateValidationContext{
-						CaCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
-							InstanceName: "my_custom_cert_provider",
-						},
-					},
-				},
-			},
-			TlsCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
-				InstanceName: "my_custom_cert_provider",
-			},
-		},
-	}
+	// tlsManager := &tls.UpstreamTlsContext{
+	// 	CommonTlsContext: &tls.CommonTlsContext{
+	// 		ValidationContextType: &tls.CommonTlsContext_CombinedValidationContext{
+	// 			CombinedValidationContext: &tls.CommonTlsContext_CombinedCertificateValidationContext{
+	// 				DefaultValidationContext: &tls.CertificateValidationContext{
+	// 					CaCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
+	// 						InstanceName: "my_custom_cert_provider",
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 		TlsCertificateProviderInstance: &tls.CertificateProviderPluginInstance{
+	// 			InstanceName: "my_custom_cert_provider",
+	// 		},
+	// 	},
+	// }
 
-	tlsManagerAsAny, err := anypb.New(tlsManager)
-	if err != nil {
-		panic(err)
-	}
+	// tlsManagerAsAny, err := anypb.New(tlsManager)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	return &cluster.Cluster{
-		Name:                 ClusterName,
-		TransportSocket: &core.TransportSocket{
-			Name: "envoy.transport_sockets.tls", // this is required, A29: if a transport_socket name is not envoy.transport_sockets.tls i.e. something we don't recognize, gRPC will NACK an LDS update
-			ConfigType: &core.TransportSocket_TypedConfig{
-				TypedConfig: tlsManagerAsAny,
-			},
-		},
+		Name: ClusterName,
+		// TransportSocket: &core.TransportSocket{
+		// 	Name: "envoy.transport_sockets.tls", // this is required, A29: if a transport_socket name is not envoy.transport_sockets.tls i.e. something we don't recognize, gRPC will NACK an LDS update
+		// 	ConfigType: &core.TransportSocket_TypedConfig{
+		// 		TypedConfig: tlsManagerAsAny,
+		// 	},
+		// },
 		ConnectTimeout:       durationpb.New(5 * time.Second),
 		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
 		EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{
@@ -100,11 +102,11 @@ func makeEndpoint(weightA uint32, weightB uint32) *endpoint.ClusterLoadAssignmen
 		Endpoints: []*endpoint.LocalityLbEndpoints{
 			{
 				Locality: &core.Locality{
-					Region:  "local1",
+					Region:  "Region1",
 					Zone:    "local1",
 					SubZone: "local1",
 				},
-				// Priority: uint32(0), //0 is highest and is default
+				Priority:            uint32(0), //0 is highest and is default
 				LoadBalancingWeight: &wrapperspb.UInt32Value{Value: weightA},
 				LbEndpoints: []*endpoint.LbEndpoint{
 					{
@@ -125,33 +127,15 @@ func makeEndpoint(weightA uint32, weightB uint32) *endpoint.ClusterLoadAssignmen
 							},
 						},
 					},
-					// { // grpc server2
-					// 	HealthStatus: core.HealthStatus_HEALTHY,
-					// 	HostIdentifier: &endpoint.LbEndpoint_Endpoint{
-					// 		Endpoint: &endpoint.Endpoint{
-					// 			Address: &core.Address{
-					// 				Address: &core.Address_SocketAddress{
-					// 					SocketAddress: &core.SocketAddress{
-					// 						Protocol: core.SocketAddress_TCP,
-					// 						Address:  UpstreamHost,
-					// 						PortSpecifier: &core.SocketAddress_PortValue{
-					// 							PortValue: uint32(50055),
-					// 						},
-					// 					},
-					// 				},
-					// 			},
-					// 		},
-					// 	},
-					// },
 				},
 			},
 			{
 				Locality: &core.Locality{
-					Region:  "local2",
+					Region:  "Region2",
 					Zone:    "local2",
 					SubZone: "local2",
 				},
-				// Priority: uint32(1),
+				Priority:            uint32(0),
 				LoadBalancingWeight: &wrapperspb.UInt32Value{Value: weightB},
 				LbEndpoints: []*endpoint.LbEndpoint{
 					{
@@ -165,6 +149,53 @@ func makeEndpoint(weightA uint32, weightB uint32) *endpoint.ClusterLoadAssignmen
 											Address:  UpstreamHost,
 											PortSpecifier: &core.SocketAddress_PortValue{
 												PortValue: UpstreamPortB,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						HealthStatus: core.HealthStatus_HEALTHY,
+						HostIdentifier: &endpoint.LbEndpoint_Endpoint{
+							Endpoint: &endpoint.Endpoint{
+								Address: &core.Address{
+									Address: &core.Address_SocketAddress{
+										SocketAddress: &core.SocketAddress{
+											Protocol: core.SocketAddress_TCP,
+											Address:  UpstreamHost,
+											PortSpecifier: &core.SocketAddress_PortValue{
+												PortValue: uint32(50055),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Locality: &core.Locality{
+					Region:  "FailOver",
+					Zone:    "local2",
+					SubZone: "local2",
+				},
+				Priority: uint32(1),
+				LoadBalancingWeight: &wrapperspb.UInt32Value{Value: 100},
+				LbEndpoints: []*endpoint.LbEndpoint{
+					{
+						HealthStatus: core.HealthStatus_HEALTHY,
+						HostIdentifier: &endpoint.LbEndpoint_Endpoint{
+							Endpoint: &endpoint.Endpoint{
+								Address: &core.Address{
+									Address: &core.Address_SocketAddress{
+										SocketAddress: &core.SocketAddress{
+											Protocol: core.SocketAddress_TCP,
+											Address:  UpstreamHost,
+											PortSpecifier: &core.SocketAddress_PortValue{
+												PortValue: uint32(50057),
 											},
 										},
 									},
@@ -274,4 +305,3 @@ func GenerateSnapshotClientSnapshot(version string, weightA uint32, weightB uint
 	)
 	return snap
 }
-

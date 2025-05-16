@@ -1,0 +1,36 @@
+{
+  "xds_servers": [
+    {
+      "server_uri": "127.0.0.1:18000",
+      "channel_creds": [
+        {
+          "type": "tls",
+          "config": {
+            "ca_certificate_file": "../../../scripts/certs/normal/ca.pem",
+            "certificate_file": "../../../scripts/certs/normal/grpcserver.pem",
+            "private_key_file": "../../../scripts/certs/normal/grpcserver_key.pem"
+          }
+        }
+      ],
+      "server_features": [
+        "xds_v3"
+      ]
+    }
+  ],
+  "node": {
+    "id": "server4",
+    "cluster": "backend_cluster"
+  },
+  "server_listener_resource_name_template": "example/resource/%s",
+  "certificate_providers": {
+    "my_custom_cert_provider": {
+      "plugin_name": "file_watcher",
+      "config": {
+        "ca_certificate_file": "../../../scripts/certs/normal/ca.pem",
+        "certificate_file": "../../../scripts/certs/normal/grpcserver.pem",
+        "private_key_file": "../../../scripts/certs/normal/grpcserver_key.pem",
+        "refresh_internal": "600s"
+      }
+    }
+  }
+}
