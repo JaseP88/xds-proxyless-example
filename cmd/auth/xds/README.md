@@ -122,6 +122,20 @@ func makeClientRoute() *route.RouteConfiguration {
 }
 ```
 
+```go
+func GenerateSnapshotClientSnapshot(version string, weightA uint32, weightB uint32) *cache.Snapshot {
+	snap, _ := cache.NewSnapshot(version,
+		map[resource.Type][]types.Resource{
+			resource.ClusterType:  {makeClusterA(), makeClusterB()}, // 2 resources
+			resource.EndpointType: {makeEndpoint(weightA, weightB), makeEndpointB(weightA, weightB)}, // 2 resources
+			resource.RouteType:    {makeClientRoute()},
+			resource.ListenerType: {makeClientListener()},
+		},
+	)
+	return snap
+}
+```
+
 ### client specific cds
 ```go
 func makeCluster() *cluster.Cluster {
