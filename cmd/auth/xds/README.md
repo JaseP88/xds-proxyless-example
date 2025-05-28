@@ -78,6 +78,46 @@ func makeClientRoute() *route.RouteConfiguration {
 }
 ```
 
+### client specific RDS weighted multi cluster routing (something like this heh)
+```go
+func makeClientRoute() *route.RouteConfiguration {
+	return &route.RouteConfiguration{
+		Name: RouteName,
+		VirtualHosts: []*route.VirtualHost{{
+			Name:    "VH",
+			Domains: []string{"*"},
+			Routes: []*route.Route{{
+				Name: "http-router",
+				Match: &route.RouteMatch{
+					PathSpecifier: &route.RoutePrefix{
+						Prefix: "/",
+					},
+				},
+				Action: &route.Route_Route{
+					Route: &route.RouteAction{
+    					ClusterSpecifier: &route.RouteAction_WeightedClusters{
+        					WeightedClusters: &route.WeightedCluster{
+            					Clusters: []*route.WeightedCluster_ClusterWeight{
+                					{
+                    					Name:   "clusterA",
+                    					Weight: &wrapperspb.UInt32Value{Value: 70},
+                					},
+                					{
+                    					Name:   "clusterB",
+                    					Weight: &wrapperspb.UInt32Value{Value: 30},
+                					},
+            				},
+        				},
+    				},
+					}
+				},
+			},
+		},
+		}},
+	}
+}
+```
+
 ### client specific RDS multi cluster routing
 ```go
 func makeClientRoute() *route.RouteConfiguration {
