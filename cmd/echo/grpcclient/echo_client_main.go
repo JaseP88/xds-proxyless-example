@@ -23,11 +23,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand/v2"
 	"strings"
 	"time"
 
-	"github.com/JaseP88/xds-poc/api/auth"
+	"github.com/JaseP88/xds-poc/api/echo"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -40,10 +39,12 @@ var (
 	target           string
 	xdsCreds         bool
 	transactionCount int64
+	clientName string
 )
 
 func init() {
 	flag.StringVar(&target, "t", "xds:///connect.me.to.grpcserver", "uri of the Greeter Server, e.g. 'xds:///helloworld-service:8080'")
+	flag.StringVar(&target, "c", "client123", "client name")
 	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
 	flag.Int64Var(&transactionCount, "tc", 10, "number of transactions to send")
 }
@@ -69,22 +70,18 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := auth.NewAuthClient(conn)
+	client := echo.NewEchoClient(conn)
 
 	counter := 0
 	for i := 0; i < int(transactionCount); i++ {
 		counter++
-		req := &auth.AuthRequest{
-			From:               "MeJason",
+		req := &echo.EchoRequest{
+			Message: "hello world",
+			FromClient: clientName,
 			TransactionCounter: int64(counter),
-			ReqPayload: &auth.Payload{
-				Currency:      "USD",
-				Amount:        float32(rand.Float32()),
-				AccountNumber: int64(rand.Int64()),
-			},
 		}
 
-		res, _ := client.DualMessageRequestResponse(context.Background(), req)
+		res, _ := client.SayHello(context.Background(), req)
 		fmt.Printf("got res: %v", res)
 
 		time.Sleep(100 * time.Millisecond)

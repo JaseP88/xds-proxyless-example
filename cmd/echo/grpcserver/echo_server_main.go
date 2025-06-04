@@ -24,9 +24,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 
-	"github.com/JaseP88/xds-poc/api/auth"
+	"github.com/JaseP88/xds-poc/api/echo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 
@@ -52,12 +51,12 @@ func init() {
 	flag.StringVar(&serverName, "n", "server_A", "server name")
 }
 
-// server implements auth service.
-type authServer struct {
-	auth.UnimplementedAuthServer
+// server implements echo service.
+type echoServer struct {
+	echo.UnimplementedEchoServer
 }
 
-func (s *authServer) DualMessage(stream auth.Auth_DualMessageServer) error {
+func (s *echoServer) SayHelloBidiStream(stream echo.Echo_SayHelloBidiStreamServer) error {
 	var bigerr error
 out:
 	for {
@@ -67,24 +66,26 @@ out:
 			bigerr = err
 			break out
 		}
-		hn, _ := os.Hostname()
+
 		counter++
 		fmt.Printf("received request %v, distribution:%f %%", req, float64(counter)/float64(req.TransactionCounter)*100)
-		resp := auth.AuthResponse{
-			Result:     hn,
-			ResPayload: req.GetReqPayload(),
+		resp := echo.EchoReply{
+			Message:     fmt.Sprintf("echo %s", req.Message),
+			FromServer: serverName,
+			ToClient: req.FromClient,
 		}
 		stream.Send(&resp)
 	}
 	return bigerr
 }
 
-func (s *authServer) DualMessageRequestResponse(_ context.Context, request *auth.AuthRequest) (*auth.AuthResponse, error) {
+func (s *echoServer) SayHello(_ context.Context, request *echo.EchoRequest) (*echo.EchoReply, error) {
 	counter++
 	fmt.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
-	resp := &auth.AuthResponse{
-		Result:     serverName,
-		ResPayload: request.GetReqPayload(),
+	resp := &echo.EchoReply{
+		Message:     fmt.Sprintf("echo %s", request.Message),
+		FromServer: serverName,
+		ToClient: request.FromClient,
 	}
 	return resp, nil
 }
@@ -100,19 +101,19 @@ func main() {
 		}
 	}
 
-	authAddy := fmt.Sprintf("%s:%d", address, port)
-	authLis, err := net.Listen("tcp4", authAddy)
+	echoAddy := fmt.Sprintf("%s:%d", address, port)
+	echoLis, err := net.Listen("tcp4", echoAddy)
 	if err != nil {
-		log.Fatalf("net.Listen(tcp4, %q) failed: %v", authAddy, err)
+		log.Fatalf("net.Listen(tcp4, %q) failed: %v", echoAddy, err)
 	}
 
 	// xdsclient within server
-	as, err := xds.NewGRPCServer(grpc.Creds(creds))
+	es, err := xds.NewGRPCServer(grpc.Creds(creds))
 	// as := grpc.NewServer(grpc.Creds(creds))
 	if err != nil {
-		log.Fatalf("Failed to create an auth gRPC server: %v", err)
+		log.Fatalf("Failed to create an echo gRPC server: %v", err)
 	}
-	auth.RegisterAuthServer(as, &authServer{})
+	echo.RegisterEchoServer(es, &echoServer{})
 
 	healthAddy := fmt.Sprintf("%s:%d", address, port+1)
 	healthLis, err := net.Listen("tcp4", healthAddy)
@@ -124,9 +125,9 @@ func main() {
 	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
 	healthgrpc.RegisterHealthServer(hs, healthServer)
 
-	log.Printf("Serving AuthService on %s and HealthService on %s", authLis.Addr().String(), healthLis.Addr().String())
+	log.Printf("Serving EchoService on %s and HealthService on %s", echoLis.Addr().String(), healthLis.Addr().String())
 	go func() {
-		as.Serve(authLis)
+		es.Serve(echoLis)
 	}()
 	hs.Serve(healthLis)
 }
