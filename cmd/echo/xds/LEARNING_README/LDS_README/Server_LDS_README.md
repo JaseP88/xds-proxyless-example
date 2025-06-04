@@ -1,6 +1,9 @@
-[Server xDS Configurations](https://github.com/grpc/proposal/blob/master/A36-xds-for-servers.md).  
+# Overview
 For the server configuration for LDS is a bit different.  
 There is a TLS Downstream Context that is configured for TLS or mTLS.  
+
+## References
+[Server xDS Configurations](https://github.com/grpc/proposal/blob/master/A36-xds-for-servers.md).  
 
 ### Grpc Server bootstrap
 ![grpc server bootstrap](/cmd/echo/xds/LEARNING_README/LDS_README/server_bootstrap.png "server bootstrap")

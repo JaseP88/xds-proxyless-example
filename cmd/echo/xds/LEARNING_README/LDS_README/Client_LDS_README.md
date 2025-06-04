@@ -1,12 +1,13 @@
-[LDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#lds)
-
-## Overview
+# Overview
 LDS or listeners are the initial resources typically used as an entry point into xDS configurations.  
 Grpc uses the target URI with the prefixed form `xds:///` to retrieve the LDS when creating a channel.  
 ```go
 grpc.NewClient("xds:///this.is.the.lds", ...)
 ```
-LDS has a relation ship with [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/RDS_README.md)
+LDS has a relation ship with [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md)
+
+## References
+[LDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#lds)  
 
 ### Grpc Client specific LDS
 ```go

@@ -44,7 +44,7 @@ var (
 
 func init() {
 	flag.StringVar(&target, "t", "xds:///connect.me.to.grpcserver", "uri of the Greeter Server, e.g. 'xds:///helloworld-service:8080'")
-	flag.StringVar(&target, "c", "client123", "client name")
+	flag.StringVar(&clientName, "c", "client123", "client name")
 	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
 	flag.Int64Var(&transactionCount, "tc", 10, "number of transactions to send")
 }

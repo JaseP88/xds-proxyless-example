@@ -1,15 +1,12 @@
-[EDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#eds)
-
-<!--  -->
-## Overview
+# Overview
 EDS or Cluster Load Assignment is the last later of Discovery Request.  
 It holds all information regarding Endpoint information for the Grpc Clients to discover.  
-LDS or listeners are the initial resources typically used as an entry point into xDS configurations.  
-Grpc uses the target URI with the prefixed form `xds:///` to retrieve the LDS when creating a channel.  
-```go
-grpc.NewClient("xds:///this.is.the.lds", ...)
-```
-LDS has a relation ship with [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/RDS_README.md)
+Such information like priority, load balancing weights, locality, addresses, etc.  
+
+EDS has a relation ship with [CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md)
+
+## References
+[EDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#eds)  
 
 ### Grpc Client specific EDS
 ```go

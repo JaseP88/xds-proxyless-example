@@ -1,10 +1,11 @@
-[CDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#cds)
-[Security RFC](https://github.com/grpc/proposal/blob/master/A29-xds-tls-security.md)
-[Circuit Breaker](https://github.com/grpc/proposal/blob/master/A32-xds-circuit-breaking.md)
-  
-## Overview
-Cluster is the 3rd layer or config Discovery Requests that is linked and referenced by [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/RDS_README.md) and [EDS](/cmd/echo/xds/LEARNING_README/EDS_README/Client_EDS_README.md).  
+# Overview
+Cluster is the 3rd layer or config Discovery Requests that is linked and referenced by [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md) and [EDS](/cmd/echo/xds/LEARNING_README/EDS_README/Client_EDS_README.md).  
 The significant configuration for cluster resource is the UpstreamTlsContext (backends) TLS cert setup for the data plane specifically for mTLS.  
+
+## References
+[CDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#cds)  
+[Security RFC](https://github.com/grpc/proposal/blob/master/A29-xds-tls-security.md)  
+[Circuit Breaker](https://github.com/grpc/proposal/blob/master/A32-xds-circuit-breaking.md)  
 
 ### Client TLS cert configuration
 ![grpc client bootstrap](/cmd/echo/xds/LEARNING_README/CDS_README/client_bootstrap.png "client bootstrap")

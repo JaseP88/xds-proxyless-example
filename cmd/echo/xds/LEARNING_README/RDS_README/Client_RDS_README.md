@@ -1,8 +1,8 @@
-[RDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#rds)
-
 ## Overview
-RDS or RouteConfigurations is the 2nd layer or config Discovery Requests that is linked and referenced by [LDS](/cmd/echo/xds/LDS_README/LDS_README.md).  
-It also references clusters [CDS](/cmd/echo/xds/LEARNING_README/CDS_README/CDS_README.md) either through different route paths (grpc full method name) or with different cluster weights.  
+RDS or RouteConfigurations is the 2nd layer or config Discovery Requests that is linked and referenced by [LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Client_LDS_README.md).  
+It also references clusters [CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md) either through different route paths (grpc full method name) or with different cluster weights.  
+
+[RDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#rds)  
 
 ### Grpc Client specific RDS with single cluster
 ```go
@@ -122,7 +122,7 @@ func makeClientRoute() *route.RouteConfiguration {
   
 Because there are multiple clusters which might have multiple endpoints distinct to those clusters we'll need to add them into their respective resource list
 ```go
-func GenerateSnapshotClientSnapshot(version string, weightA uint32, weightB uint32) *cache.Snapshot {
+func GenerateSnapshotClientSnapshot() *cache.Snapshot {
 	snap, _ := cache.NewSnapshot(version,
 		map[resource.Type][]types.Resource{
 			resource.ClusterType:  {makeClusterA(), makeClusterB()}, // 2 resources

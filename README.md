@@ -6,7 +6,16 @@ The codebase is predominantly sourced from Envoy's [go-control-plane](https://gi
 This project was to help me learn about xDS, control plane, service meshes, along with golang.  
 Given at this current moment there are not a lot of working examples of a control plane / xDS server with proxyless grpc in the open community, I hope this example can help some of those fortunate folks who stumble across this repo.  
 Secured mTLS is also implemented across the data-plane (grpc clients to servers) and the control plane (grpc clients and servers to xDS server)  
-Cheers
+Cheers!  
+
+## Learning References
+[Grpc Client LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Client_LDS_README.md)  
+[Grpc Server LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Server_LDS_README.md)  
+[Grpc Client RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md)  
+[Grpc Server RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Server_RDS_README.md)  
+[Grpc Client CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md)  
+[Grpc Client EDS](/cmd/echo/xds/LEARNING_README/EDS_README/Client_EDS_README.md)  
+
 
 ## Run
 ### generate certs
