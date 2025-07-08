@@ -1,0 +1,20 @@
+syntax = "proto3";
+package greeter;
+option go_package = "/golang-grpc/greeter";
+
+service Greeter {
+  rpc SayHello (GreetRequest) returns (GreetReply) {}
+  rpc SayHelloInVietnamese (GreetRequest) returns (GreetReply) {}
+}
+
+message GreetRequest {
+  string name = 1;
+  string fromClient = 2;
+  int64 transactionCounter = 3;
+}
+
+message GreetReply {
+  string greet = 1;
+  string fromServer = 2;
+  string toClient = 3;
+}

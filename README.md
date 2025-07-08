@@ -9,12 +9,12 @@ Secured mTLS is also implemented across the data-plane (grpc clients to servers)
 Cheers!  
 
 ## Learning References
-[Grpc Client LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Client_LDS_README.md)  
-[Grpc Server LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Server_LDS_README.md)  
-[Grpc Client RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md)  
-[Grpc Server RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Server_RDS_README.md)  
-[Grpc Client CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md)  
-[Grpc Client EDS](/cmd/echo/xds/LEARNING_README/EDS_README/Client_EDS_README.md)  
+[Grpc Client LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Client_LDS_README.md)  
+[Grpc Server LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Server_LDS_README.md)  
+[Grpc Client RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Client_RDS_README.md)  
+[Grpc Server RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Server_RDS_README.md)  
+[Grpc Client CDS](/cmd/greet/xds/LEARNING_README/CDS_README/Client_CDS_README.md)  
+[Grpc Client EDS](/cmd/greet/xds/LEARNING_README/EDS_README/Client_EDS_README.md)  
 
 
 ## Run
@@ -65,59 +65,59 @@ go run .
 ### setup  
 1 xDS  
 1 grpc client  
-1 grpc server in clusterA  
-2 grpc server in clusterB  
-1 grpc server in Failover cluster  
+1 grpc server (s1) in Locality1  
+2 grpc servers (s2 & s3) in Locality2  
+1 grpc server (s4) in Locality3 "Failover - lower priority"
   
 ### scenarios
 This outlines the traffic split by percentage across all the grpc servers   
   
-***(1) Initial State***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  90         |  5          |  5          |  0                 |
+*** (1) Initial State by percentage Locality1 = 90% & Locality2 = 10% ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  90 (s1)    |  5 (s2)     |  5 (s3)     |  0 (s4)     |
 
-***(2) Remove ClusterA***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  X          |  50         |  50         |  0                 |
+*** (2) Remove s1 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  X (s1)     |  50 (s2)    |  50 (s3)    |  0 (s4)     |
 
-***(3) Remove ClusterB_2***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  X          |  100        |  X          |  0                 |
+*** (3) Remove s3 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  X (s1)     |  100 (s2)   |  X (s3)     |  0 (s4)     |
 
-***(4) Remove ClusterB_1***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  X          |  X          |  X          |  100               |
+*** (4) Remove s2 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  X (s1)     |  X (s2)     |  X (s3)     |  100 (s4)   |
 
-***(5) Update ClusterA weight to 10%, Update ClusterB weight to 90%***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  X          |  X          |  X          |  100               |
+*** (5) Update Locality1 weight to 10%, Update Locality2 weight to 90% ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  X (s1)     |  X (s2)     |  X (s3)     |  100 (s4)   |
 
-***(6) Restart ClusterA***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  100        |  X          |  X          |  0                 |
+*** (6) Restart s1 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  100 (s1)   |  X (s2)     |  X (s3)     |  0 (s4)     |
 
-***(7) Restart ClusterB_1***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  10         |  90         |  X          |  0               |
+*** (7) Restart s2 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  10 (s1)    |  90 (s2)    |  X (s3)     |  0 (s4)     |
 
-***(8) Restart ClusterB_2***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  10         |  45         |  45         |  0                 |
+*** (8) Restart s3 ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  10 (s1)    |  45 (s2)    |  45 (s3)    |  0 (s4)     |
 
-***(9) Remove XDS***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  10          |  45        |  45         |  0                |
+*** (9) Remove XDS ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  10 (s1)    |  45 (s2)    |  45 (s3)    |  0 (s4)     |
 
-***(10) Restart XDS***  
-|  ClusterA   |  ClusterB_1 |  ClusterB_2 |  Cluster Failover  |
-|  ---------  |  ---------  |  ---------  |  ----------------  |
-|  90         |  5          |  5          |  0                 |
+*** (10) Restart XDS ***  
+|  Locality1  |  Locality2  |  Locality2  |  Locality3  |
+|  ---------  |  ---------  |  ---------  |  ---------  |
+|  90 (s1)    |  5 (s2)     |  5 (s3)     |  0 (s4)     |

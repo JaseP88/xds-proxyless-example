@@ -1,5 +1,5 @@
 # Overview
-Cluster is the 3rd layer or config Discovery Requests that is linked and referenced by [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md) and [EDS](/cmd/echo/xds/LEARNING_README/EDS_README/Client_EDS_README.md).  
+Cluster is the 3rd layer or config Discovery Requests that is linked and referenced by [RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Client_RDS_README.md) and [EDS](/cmd/greet/xds/LEARNING_README/EDS_README/Client_EDS_README.md).  
 The significant configuration for cluster resource is the UpstreamTlsContext (backends) TLS cert setup for the data plane specifically for mTLS.  
 
 ## References
@@ -8,7 +8,7 @@ The significant configuration for cluster resource is the UpstreamTlsContext (ba
 [Circuit Breaker](https://github.com/grpc/proposal/blob/master/A32-xds-circuit-breaking.md)  
 
 ### Client TLS cert configuration
-![grpc client bootstrap](/cmd/echo/xds/LEARNING_README/CDS_README/client_bootstrap.png "client bootstrap")
+![grpc client bootstrap](/cmd/greet/xds/LEARNING_README/CDS_README/client_bootstrap.png "client bootstrap")
 
 
 ### Grpc Client specific cds

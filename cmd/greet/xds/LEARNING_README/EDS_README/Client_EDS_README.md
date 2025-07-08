@@ -3,7 +3,7 @@ EDS or Cluster Load Assignment is the last later of Discovery Request.
 It holds all information regarding Endpoint information for the Grpc Clients to discover.  
 Such information like priority, load balancing weights, locality, addresses, etc.  
 
-EDS has a relation ship with [CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md)
+EDS has a relation ship with [CDS](/cmd/greet/xds/LEARNING_README/CDS_README/Client_CDS_README.md)
 
 ## References
 [EDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#eds)  

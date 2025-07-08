@@ -1,6 +1,6 @@
 ## Overview
-RDS or RouteConfigurations is the 2nd layer or config Discovery Requests that is linked and referenced by [LDS](/cmd/echo/xds/LEARNING_README/LDS_README/Client_LDS_README.md).  
-It also references clusters [CDS](/cmd/echo/xds/LEARNING_README/CDS_README/Client_CDS_README.md) either through different route paths (grpc full method name) or with different cluster weights.  
+RDS or RouteConfigurations is the 2nd layer or config Discovery Requests that is linked and referenced by [LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Client_LDS_README.md).  
+It also references clusters [CDS](/cmd/greet/xds/LEARNING_README/CDS_README/Client_CDS_README.md) either through different route paths (grpc full method name) or with different cluster weights.  
 
 [RDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#rds)  
 
@@ -33,6 +33,7 @@ func makeClientRoute() *route.RouteConfiguration {
 	}
 }
 ```
+![alt text](../asset/xds_cluster.jpg).  
 
 ### client specific RDS weighted multi cluster routing
 ```go
@@ -57,13 +58,14 @@ func makeClientRoute() *route.RouteConfiguration {
         					WeightedClusters: &route.WeightedCluster{
             					Clusters: []*route.WeightedCluster_ClusterWeight{
                 					{
-                    					Name:   "clusterA",
-                    					Weight: &wrapperspb.UInt32Value{Value: 70},
+                    					Name:   "WeightedCluster1",
+                    					Weight: &wrapperspb.UInt32Value{Value: 25},
                 					},
                 					{
-                    					Name:   "clusterB",
-                    					Weight: &wrapperspb.UInt32Value{Value: 30},
+                    					Name:   "WeightedCLuster2",
+                    					Weight: &wrapperspb.UInt32Value{Value: 25},
                 					},
+									// ...
             				},
         				},
     				},
@@ -75,6 +77,7 @@ func makeClientRoute() *route.RouteConfiguration {
 	}
 }
 ```
+![alt text](../asset/xds_weightedcluster.jpg).  
 
 ### RDS multi cluster routing
 ```go
@@ -88,13 +91,13 @@ func makeClientRoute() *route.RouteConfiguration {
 				Name: "http-router",
 				Match: &route.RouteMatch{
 					PathSpecifier: &route.RouteMatch_Path{
-						Path: "/domain.MyService/UnaryReq",  // full name path of grpc service proto, /package.grpcservice/rpc
+						Path: "/greeter.Greeter/SayHello",  // full name path of grpc service proto, /package.grpcservice/rpc
 					},
 				},
 				Action: &route.Route_Route{
 					Route: &route.RouteAction{
 						ClusterSpecifier: &route.RouteAction_Cluster{
-							Cluster: "clusterA",
+							Cluster: "EnglishCluster",
 						},
 					},
 				},
@@ -103,13 +106,13 @@ func makeClientRoute() *route.RouteConfiguration {
 				Name: "http-router",
 				Match: &route.RouteMatch{
 					PathSpecifier: &route.RouteMatch_Path{
-						Path: "/domain2.AnotherService/DifferentRPC", // full name path of grpc service proto
+						Path: "/greeter.Greeter/SayHelloInVietnamese", // full name path of grpc service proto
 					},
 				},
 				Action: &route.Route_Route{
 					Route: &route.RouteAction{
 						ClusterSpecifier: &route.RouteAction_Cluster{
-							Cluster: "clusterB",
+							Cluster: "VietnameseCluster",
 						},
 					},
 				},
@@ -119,6 +122,7 @@ func makeClientRoute() *route.RouteConfiguration {
 	}
 }
 ```
+![alt text](../asset/xds_routedcluster.jpg).  
   
 Because there are multiple clusters which might have multiple endpoints distinct to those clusters we'll need to add them into their respective resource list
 ```go

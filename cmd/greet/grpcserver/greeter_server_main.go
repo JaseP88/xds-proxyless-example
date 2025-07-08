@@ -25,7 +25,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/JaseP88/xds-poc/api/echo"
+	"github.com/JaseP88/xds-poc/api/greeter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 
@@ -51,39 +51,26 @@ func init() {
 	flag.StringVar(&serverName, "n", "server_A", "server name")
 }
 
-// server implements echo service.
-type echoServer struct {
-	echo.UnimplementedEchoServer
+type greeterServer struct {
+	greeter.UnimplementedGreeterServer
 }
 
-func (s *echoServer) SayHelloBidiStream(stream echo.Echo_SayHelloBidiStreamServer) error {
-	var bigerr error
-out:
-	for {
-		req, err := stream.Recv()
-		if err != nil {
-			fmt.Println("failed to receive request", err)
-			bigerr = err
-			break out
-		}
-
-		counter++
-		fmt.Printf("received request %v, distribution:%f %%", req, float64(counter)/float64(req.TransactionCounter)*100)
-		resp := echo.EchoReply{
-			Message:     fmt.Sprintf("echo %s", req.Message),
-			FromServer: serverName,
-			ToClient: req.FromClient,
-		}
-		stream.Send(&resp)
-	}
-	return bigerr
-}
-
-func (s *echoServer) SayHello(_ context.Context, request *echo.EchoRequest) (*echo.EchoReply, error) {
+func (s *greeterServer) SayHello(_ context.Context, request *greeter.GreetRequest) (*greeter.GreetReply, error) {
 	counter++
 	fmt.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
-	resp := &echo.EchoReply{
-		Message:     fmt.Sprintf("echo %s", request.Message),
+	resp := &greeter.GreetReply{
+		Greet:     fmt.Sprintf("Hello %s!", request.Name),
+		FromServer: serverName,
+		ToClient: request.FromClient,
+	}
+	return resp, nil
+}
+
+func (s *greeterServer) SayHelloInVietnamese(_ context.Context, request *greeter.GreetRequest) (*greeter.GreetReply, error) {
+	counter++
+	fmt.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
+	resp := &greeter.GreetReply{
+		Greet:     fmt.Sprintf("Xin Chao %s!", request.Name),
 		FromServer: serverName,
 		ToClient: request.FromClient,
 	}
@@ -101,19 +88,19 @@ func main() {
 		}
 	}
 
-	echoAddy := fmt.Sprintf("%s:%d", address, port)
-	echoLis, err := net.Listen("tcp4", echoAddy)
+	greeterAddy := fmt.Sprintf("%s:%d", address, port)
+	greeterLis, err := net.Listen("tcp4", greeterAddy)
 	if err != nil {
-		log.Fatalf("net.Listen(tcp4, %q) failed: %v", echoAddy, err)
+		log.Fatalf("net.Listen(tcp4, %q) failed: %v", greeterAddy, err)
 	}
 
 	// xdsclient within server
 	es, err := xds.NewGRPCServer(grpc.Creds(creds))
 	// as := grpc.NewServer(grpc.Creds(creds))
 	if err != nil {
-		log.Fatalf("Failed to create an echo gRPC server: %v", err)
+		log.Fatalf("Failed to create an Greeter gRPC server: %v", err)
 	}
-	echo.RegisterEchoServer(es, &echoServer{})
+	greeter.RegisterGreeterServer(es, &greeterServer{})
 
 	healthAddy := fmt.Sprintf("%s:%d", address, port+1)
 	healthLis, err := net.Listen("tcp4", healthAddy)
@@ -125,9 +112,9 @@ func main() {
 	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
 	healthgrpc.RegisterHealthServer(hs, healthServer)
 
-	log.Printf("Serving EchoService on %s and HealthService on %s", echoLis.Addr().String(), healthLis.Addr().String())
+	log.Printf("Serving GreeterService on %s and HealthService on %s", greeterLis.Addr().String(), healthLis.Addr().String())
 	go func() {
-		es.Serve(echoLis)
+		es.Serve(greeterLis)
 	}()
 	hs.Serve(healthLis)
 }

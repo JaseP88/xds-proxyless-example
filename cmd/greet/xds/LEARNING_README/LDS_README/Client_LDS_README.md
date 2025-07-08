@@ -4,7 +4,7 @@ Grpc uses the target URI with the prefixed form `xds:///` to retrieve the LDS wh
 ```go
 grpc.NewClient("xds:///this.is.the.lds", ...)
 ```
-LDS has a relation ship with [RDS](/cmd/echo/xds/LEARNING_README/RDS_README/Client_RDS_README.md)
+LDS has a relation ship with [RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Client_RDS_README.md)
 
 ## References
 [LDS RFC](https://github.com/grpc/proposal/blob/master/A27-xds-global-load-balancing.md#lds)  
@@ -38,7 +38,7 @@ func makeClientListener() *listener.Listener {
 	}
 
 	return &listener.Listener{
-		Name: "this.is.the.lds",
+		Name: "connect.me.to.grpcserver",
         // grpc only support APIListener
 		ApiListener: &listener.ApiListener{
 			ApiListener: httpConnectionManagerAsAny, 

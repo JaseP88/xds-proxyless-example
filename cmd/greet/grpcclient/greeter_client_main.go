@@ -23,10 +23,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"time"
 
-	"github.com/JaseP88/xds-poc/api/echo"
+	"github.com/JaseP88/xds-poc/api/greeter"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -39,8 +40,21 @@ var (
 	target           string
 	xdsCreds         bool
 	transactionCount int64
-	clientName string
+	clientName       string
 )
+
+var names = []string{
+	"Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hannah", "Ivan", "Julia",
+	"Kevin", "Laura", "Mike", "Nina", "Oscar", "Paul", "Quincy", "Rachel", "Steve", "Tina",
+	"Uma", "Victor", "Wendy", "Xander", "Yara", "Zane", "Aaron", "Bella", "Cody", "Diana",
+	"Elena", "Felix", "Gina", "Henry", "Isabel", "Jack", "Kara", "Liam", "Mona", "Noah",
+	"Olivia", "Peter", "Queen", "Rita", "Sam", "Tracy", "Ulysses", "Vera", "Will", "Xenia",
+	"Yusuf", "Zoey", "Amber", "Blake", "Carmen", "Derek", "Elsa", "Finn", "Gloria", "Harvey",
+	"Ingrid", "Jonas", "Kelsey", "Leon", "Megan", "Nate", "Opal", "Preston", "Quinn", "Rosa",
+	"Shawn", "Tara", "Uri", "Val", "Wade", "Ximena", "Yvette", "Zack", "Anya", "Brent",
+	"Cara", "Damon", "Erin", "Freya", "Gavin", "Hazel", "Irene", "Jared", "Kurt", "Lena",
+	"Martin", "Nora", "Omar", "Penny", "Quentin", "Rex", "Sophie", "Tom", "Ulric", "Violet",
+}
 
 func init() {
 	flag.StringVar(&target, "t", "xds:///connect.me.to.grpcserver", "uri of the Greeter Server, e.g. 'xds:///helloworld-service:8080'")
@@ -70,14 +84,14 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := echo.NewEchoClient(conn)
+	client := greeter.NewGreeterClient(conn)
 
 	counter := 0
 	for i := 0; i < int(transactionCount); i++ {
 		counter++
-		req := &echo.EchoRequest{
-			Message: "hello world",
-			FromClient: clientName,
+		req := &greeter.GreetRequest{
+			Name:               names[rand.Intn(100)],
+			FromClient:         clientName,
 			TransactionCounter: int64(counter),
 		}
 

@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/JaseP88/xds-poc/cmd/echo/xds/internal"
-	"github.com/JaseP88/xds-poc/cmd/echo/xds/internal/xds_resources"
+	"github.com/JaseP88/xds-poc/cmd/greet/xds/internal"
+	"github.com/JaseP88/xds-poc/cmd/greet/xds/internal/xds_resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/v3"
