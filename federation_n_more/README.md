@@ -2,7 +2,7 @@
 
 
 ### Dynamic discovery (works anywhere)
-    - Use requests from gRPC server to identity (new) and register. 
+#### Use requests from gRPC server to identify (new) and register. 
 ```sh
 URL type: type.googleapis.com/envoy.config.listener.v3.Listener
 Resource name: grpc/server?xds.resource.listening_address=11.222.333.444:5555"
@@ -11,7 +11,7 @@ Resource name: grpc/server?xds.resource.listening_address=11.222.333.444:5555"
 
 
 ### xDS Fallback
-    - Can configure multiple xDS services.
+#### xxCan configure multiple xDS services.
 
 ### xDS Federation
     - slice & dice, load distribution and isolation. 
@@ -19,7 +19,14 @@ Resource name: grpc/server?xds.resource.listening_address=11.222.333.444:5555"
 
 
 ### Lesson
-    - Single point of failure: Watcher established at client side. 
-    ![alt text](multiple_xDS.png)
-    - Multi-cluster, absence of failure recognition.
-    ![alt text](grouping_bad_cluster.png)
+##### xDS Fallback
+###### 1. Can configure multiple xDS services.
+###### 2. Single point of failure?  yes, after Watcher is established at client side. 
+![alt text](multiple_xDS.png)
+
+#### Multi-cluster
+##### 1. Isolation (Federation)
+##### 2. Distribution of load
+##### 3. Upstream/End-point Failure recognition 
+##### 4. (Avoidance of bad clusters)
+![alt text](grouping_bad_cluster.png)
