@@ -1,0 +1,47 @@
+#This is a manifest file for loading xDS with predefined configurtion
+#
+---
+
+service:
+  FileNode1:
+    xdstp.upstream:
+      route: 
+      cluster:
+        - clusterName: xdtspCluster
+          federatedEdsName: "xdstp://non-default-auth/envoy.config.route.v3.ClusterLoadAssignment/endpoint_Federation_Enabled"
+          weight: 1
+        - clusterName: localCluster1
+          weight: 5
+    primary.upstream:
+      route: 
+      cluster:
+        - clusterName: localCluster1
+          weight: 1
+        - clusterName: localCluster2
+          weight: 5
+
+# Define static endpoints
+# A Cluster can have one ore more endpoint grouped under same host or under a Region, zone, subzone.
+# Below clusterloadassignment has 2 clusters, each having single Region, Zone, Subzone and multiple endpoints under same host.  
+clusterloadassignment:
+  localCluster1:
+    - region: r1
+      zone: z1
+      subzone: sz1
+      endpoint:
+        - host: 22.13.22.11
+          port: [50051, 50053]
+          weight: 1
+      weight: 1
+      priority: 0
+  localCluster2:
+    - region: r1
+      zone:  z1
+      subzone: sz1
+      endpoint:
+        - host: 10.15.14.444
+          port: [50055]
+          weight: 1
+      weight: 1
+      priority: 0
+

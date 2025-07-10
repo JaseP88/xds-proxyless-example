@@ -1,0 +1,83 @@
+#This is a manifest file for loading xDS with predefined configurtion
+---
+
+service:
+  {Service Name}:   
+    {Listener Name}:
+      route: {Route Name}
+      cluster:
+        - clusterName: {Cluster Name}
+          weight: {weight}  //optional
+          federatedEdsName: {Federated EDS Name} //optional
+    {ListenerName}:
+      route: {Route Name}
+      cluster:
+        - clusterName: {Cluster Name}
+          weight: {weight}  //optional
+          federatedEdsName: {Federated EDS Name} //optional
+  {Service Name}:
+    {Listener Name}:
+      route: {Route Name}
+      cluster:
+        - clusterName: {Cluster Name}
+          weight: {weight}  //optional
+          federatedEdsName: {Federated EDS Name} //optional
+    {ListenerName}:
+      route: {Route Name}
+      cluster:
+        - clusterName: {Cluster Name}
+          weight: {weight}  //optional
+          federatedEdsName: {Federated EDS Name} //optional
+
+clusterloadassignment:
+  {Cluster Name}:  //Cluster Name must match above declaration under "cluster"
+    - region: {region Name}
+      zone: {Zone Name}
+      subzone: {SubZone Name}
+      endpoint:
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+      weight: {weight} //optional
+      priority: {Priority} //optional
+    - region: {region Name}
+      zone: {Zone Name}
+      subzone: {SubZone Name}
+      endpoint:
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+      weight: {weight} //optional
+      priority: {Priority} //optional
+  {Cluster Name}:  //Cluster Name must match above declaration under "cluster"
+    - region: {region Name}
+      zone: {Zone Name}
+      subzone: {SubZone Name}
+      endpoint:
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+      weight: {weight} //optional
+      priority: {Priority} //optional
+    - region: {region Name}
+      zone: {Zone Name}
+      subzone: {SubZone Name}
+      endpoint:
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+        - host: {Host IP}
+          port: {Arrary of ports}
+          weight: {weight} //optional
+      weight: {weight} //optional
+      priority: {Priority} //optional
+

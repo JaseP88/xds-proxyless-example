@@ -1,0 +1,33 @@
+{
+  "xds_servers": [
+    {
+      "server_uri": "127.0.0.1:8005",
+      "channel_creds": [
+        {
+          "type": "insecure"
+        }
+      ],
+      "server_features": ["xds_v3"]
+    }
+  ],
+  "node": {
+          "id": "nodefoo1",
+          "cluster": "cls1",
+          "metadata": {
+             "cluser_weight": 1,
+             "service_id": "FileNode1",
+             "upstream_weight": 1,
+             "priority": 0,
+             "isbackup": false,
+             "locality_weight": 1,
+             "federation_name": "xdstp://non-default-auth/envoy.config.route.v3.ClusterLoadAssignment/endpoint_Federation_Enabled"
+          },
+          "locality": {
+                  "region": "useast",
+                  "zone": "az1",
+                  "sub_zone": "sz1"
+          }
+
+  },
+  "server_listener_resource_name_template": "grpc/server?xds.resource.listening_address=%s"
+}

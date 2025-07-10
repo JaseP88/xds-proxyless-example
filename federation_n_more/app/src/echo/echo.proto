@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package echo;
+
+option go_package = "example.com/app/echo";
+
+service EchoServer {
+  rpc SayHello (EchoRequest) returns (EchoReply) {}
+  rpc SayHelloStream(EchoRequest) returns (stream EchoReply) {}    
+  rpc SayHelloBidStream(stream EchoRequest) returns (stream EchoReply) {}
+}
+
+message EchoRequest {
+  string id = 1;
+  string type = 2;
+  string from = 3;
+  string name = 4;
+}
+
+message EchoReply {
+  string id = 1;
+  string type = 2;
+  string from = 3;
+  string message = 4;
+}
