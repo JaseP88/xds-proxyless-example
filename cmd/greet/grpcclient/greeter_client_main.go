@@ -60,7 +60,7 @@ func init() {
 	flag.StringVar(&target, "t", "xds:///connect.me.to.grpcserver", "uri of the Greeter Server, e.g. 'xds:///helloworld-service:8080'")
 	flag.StringVar(&clientName, "c", "client123", "client name")
 	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
-	flag.Int64Var(&transactionCount, "tc", 10, "number of transactions to send")
+	flag.Int64Var(&transactionCount, "tc", 1000, "number of transactions to send")
 }
 
 func main() {
@@ -95,7 +95,8 @@ func main() {
 			TransactionCounter: int64(counter),
 		}
 
-		res, _ := client.SayHello(context.Background(), req)
+		// res, _ := client.SayHello(context.Background(), req)
+		res, _ := client.SayHelloInVietnamese(context.Background(), req)
 		fmt.Printf("got res: %v", res)
 
 		time.Sleep(100 * time.Millisecond)

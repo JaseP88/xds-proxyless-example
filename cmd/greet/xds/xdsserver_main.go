@@ -26,8 +26,10 @@ import (
 	"github.com/JaseP88/xds-poc/cmd/greet/xds/internal"
 	"github.com/JaseP88/xds-poc/cmd/greet/xds/internal/xds_resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	// res "github.com/JaseP88/xds-poc/cmd/greet/xds/internal/xds_resources/singlecluster"
+	// res "github.com/JaseP88/xds-poc/cmd/greet/xds/internal/xds_resources/weightedcluster"
+	res "github.com/JaseP88/xds-poc/cmd/greet/xds/internal/xds_resources/multiroutedcluster"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/test/v3"
 )
 
 var (
@@ -65,11 +67,11 @@ func main() {
 	registerSnapshot(server3Snapshot, cache, "server3")
 	server4Snapshot := resources.GenerateSnapshotServerSnapshot("", 50057)
 	registerSnapshot(server4Snapshot, cache, "server4")
-	clientSnapshot := resources.GenerateSnapshotClientSnapshot("", 90, 10)
+	clientSnapshot := res.GenerateSnapshotClientSnapshot("", 90, 10)
 	registerSnapshot(clientSnapshot, cache, "client123")
 
 	ctx := context.Background()
-	cb := &test.Callbacks{Debug: l.Debug}
+	cb := &internal.MyCallbacks{}
 	srv := server.NewServer(ctx, cache, cb)
 
 	// Run the xDS server
@@ -90,7 +92,7 @@ func main() {
 		targetWeightB, _ := reader.ReadString('\n')
 		twB, _ := strconv.Atoi(strings.Trim(targetWeightB, "\n"))
 
-		newSnap := resources.GenerateSnapshotClientSnapshot(strconv.Itoa(versionNum), uint32(twA), uint32(twB))
+		newSnap := res.GenerateSnapshotClientSnapshot(strconv.Itoa(versionNum), uint32(twA), uint32(twB))
 		versionNum++
 
 		if err := newSnap.Consistent(); err != nil {

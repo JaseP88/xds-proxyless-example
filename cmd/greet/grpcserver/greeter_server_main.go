@@ -95,12 +95,12 @@ func main() {
 	}
 
 	// xdsclient within server
-	es, err := xds.NewGRPCServer(grpc.Creds(creds))
+	greeterService, err := xds.NewGRPCServer(grpc.Creds(creds))
 	// as := grpc.NewServer(grpc.Creds(creds))
 	if err != nil {
 		log.Fatalf("Failed to create an Greeter gRPC server: %v", err)
 	}
-	greeter.RegisterGreeterServer(es, &greeterServer{})
+	greeter.RegisterGreeterServer(greeterService, &greeterServer{})
 
 	healthAddy := fmt.Sprintf("%s:%d", address, port+1)
 	healthLis, err := net.Listen("tcp4", healthAddy)
@@ -114,7 +114,7 @@ func main() {
 
 	log.Printf("Serving GreeterService on %s and HealthService on %s", greeterLis.Addr().String(), healthLis.Addr().String())
 	go func() {
-		es.Serve(greeterLis)
+		greeterService.Serve(greeterLis)
 	}()
 	hs.Serve(healthLis)
 }

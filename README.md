@@ -9,16 +9,17 @@ Secured mTLS is also implemented across the data-plane (grpc clients to servers)
 Cheers!  
 
 ## Learning References
-[Grpc Client LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Client_LDS_README.md)  
-[Grpc Server LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Server_LDS_README.md)  
-[Grpc Client RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Client_RDS_README.md)  
-[Grpc Server RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Server_RDS_README.md)  
-[Grpc Client CDS](/cmd/greet/xds/LEARNING_README/CDS_README/Client_CDS_README.md)  
-[Grpc Client EDS](/cmd/greet/xds/LEARNING_README/EDS_README/Client_EDS_README.md)  
-
+- [Grpc Client setup](/cmd/greet/grpcclient/README.md)  
+- [Grpc Server setup](/cmd/greet/grpcserver/README.md)  
+- [xDS: Grpc Client LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Client_LDS_README.md)  
+- [xDS: Grpc Server LDS](/cmd/greet/xds/LEARNING_README/LDS_README/Server_LDS_README.md)  
+- [xDS: Grpc Client RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Client_RDS_README.md)  
+- [xDS: Grpc Server RDS](/cmd/greet/xds/LEARNING_README/RDS_README/Server_RDS_README.md)  
+- [xDS: Grpc Client CDS](/cmd/greet/xds/LEARNING_README/CDS_README/Client_CDS_README.md)  
+- [xDS: Grpc Client EDS](/cmd/greet/xds/LEARNING_README/EDS_README/Client_EDS_README.md)  
 
 ## Run
-### generate certs
+### generate certs if not there
 ```sh
 cd pathto/scripts/certs/normal
 sh generatecert.sh
@@ -43,7 +44,8 @@ go run . -p=50051 -n="server_A"
 export GRPC_XDS_BOOTSTRAP=pathto/cmd/auth/grpcserver/server2_bootstrap.json
 go run . -p=50053 -n="server_B"
 ```
-`note: Initial weighted LB policy is 90% to server_A and 10% to server_B`
+> note: Initial weighted LB policy is 90% to server_A and 10% to server_B`
+>
 
 ### grpc client
 To run a client.
