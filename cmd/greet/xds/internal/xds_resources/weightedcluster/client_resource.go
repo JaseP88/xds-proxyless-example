@@ -38,6 +38,83 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
+func makeClientListener() *listener.Listener {
+	routerConfig, _ := anypb.New(&router.Router{})
+
+	httpConnectionManager := &hcm.HttpConnectionManager{
+		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
+			Rds: &hcm.Rds{
+				ConfigSource: &core.ConfigSource{
+					ConfigSourceSpecifier: &core.ConfigSource_Ads{
+						Ads: &core.AggregatedConfigSource{},
+					},
+				},
+				RouteConfigName: resources.RouteName,
+			},
+		},
+		HttpFilters: []*hcm.HttpFilter{{
+			Name:       "http-router",
+			ConfigType: &hcm.HttpFilter_TypedConfig{TypedConfig: routerConfig},
+		}},
+	}
+
+	httpConnectionManagerAsAny, err := anypb.New(httpConnectionManager)
+	if err != nil {
+		panic(err)
+	}
+
+	return &listener.Listener{
+		Name: resources.GrpcClientListener,
+		ApiListener: &listener.ApiListener{
+			ApiListener: httpConnectionManagerAsAny,
+		},
+		FilterChains: []*listener.FilterChain{{
+			Name: "filter-chain",
+			Filters: []*listener.Filter{{
+				Name:       wellknown.HTTPConnectionManager,
+				ConfigType: &listener.Filter_TypedConfig{TypedConfig: httpConnectionManagerAsAny},
+			}},
+		}},
+	}
+}
+
+
+func makeClientRoute() *route.RouteConfiguration {
+	return &route.RouteConfiguration{
+		Name: resources.RouteName,
+		VirtualHosts: []*route.VirtualHost{{
+			Name:    "VH",
+			Domains: []string{"*"},
+			Routes: []*route.Route{{
+				Name: "http-router",
+				Match: &route.RouteMatch{
+					PathSpecifier: &route.RouteMatch_Prefix{
+						Prefix: "/",
+					},
+				},
+				Action: &route.Route_Route{
+					Route: &route.RouteAction{
+						ClusterSpecifier: &route.RouteAction_WeightedClusters{
+							WeightedClusters: &route.WeightedCluster{
+								Clusters: []*route.WeightedCluster_ClusterWeight{
+									{
+										Name:   resources.ClusterA,
+										Weight: &wrapperspb.UInt32Value{Value: uint32(70)},
+									},
+									{
+										Name:   resources.ClusterB,
+										Weight: &wrapperspb.UInt32Value{Value: uint32(30)},
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
+		}},
+	}
+}
+
 func makeClusterA() *cluster.Cluster {
 	tlsManager := &tls.UpstreamTlsContext{
 		CommonTlsContext: &tls.CommonTlsContext{
@@ -235,82 +312,6 @@ func makeEndpointB() *endpoint.ClusterLoadAssignment {
 				},
 			},
 		},
-	}
-}
-
-func makeClientRoute() *route.RouteConfiguration {
-	return &route.RouteConfiguration{
-		Name: resources.RouteName,
-		VirtualHosts: []*route.VirtualHost{{
-			Name:    "VH",
-			Domains: []string{"*"},
-			Routes: []*route.Route{{
-				Name: "http-router",
-				Match: &route.RouteMatch{
-					PathSpecifier: &route.RouteMatch_Prefix{
-						Prefix: "/",
-					},
-				},
-				Action: &route.Route_Route{
-					Route: &route.RouteAction{
-						ClusterSpecifier: &route.RouteAction_WeightedClusters{
-							WeightedClusters: &route.WeightedCluster{
-								Clusters: []*route.WeightedCluster_ClusterWeight{
-									{
-										Name:   resources.ClusterA,
-										Weight: &wrapperspb.UInt32Value{Value: uint32(70)},
-									},
-									{
-										Name:   resources.ClusterB,
-										Weight: &wrapperspb.UInt32Value{Value: uint32(30)},
-									},
-								},
-							},
-						},
-					},
-				},
-			}},
-		}},
-	}
-}
-
-func makeClientListener() *listener.Listener {
-	routerConfig, _ := anypb.New(&router.Router{})
-
-	httpConnectionManager := &hcm.HttpConnectionManager{
-		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
-			Rds: &hcm.Rds{
-				ConfigSource: &core.ConfigSource{
-					ConfigSourceSpecifier: &core.ConfigSource_Ads{
-						Ads: &core.AggregatedConfigSource{},
-					},
-				},
-				RouteConfigName: resources.RouteName,
-			},
-		},
-		HttpFilters: []*hcm.HttpFilter{{
-			Name:       "http-router",
-			ConfigType: &hcm.HttpFilter_TypedConfig{TypedConfig: routerConfig},
-		}},
-	}
-
-	httpConnectionManagerAsAny, err := anypb.New(httpConnectionManager)
-	if err != nil {
-		panic(err)
-	}
-
-	return &listener.Listener{
-		Name: resources.GrpcClientListener,
-		ApiListener: &listener.ApiListener{
-			ApiListener: httpConnectionManagerAsAny,
-		},
-		FilterChains: []*listener.FilterChain{{
-			Name: "filter-chain",
-			Filters: []*listener.Filter{{
-				Name:       wellknown.HTTPConnectionManager,
-				ConfigType: &listener.Filter_TypedConfig{TypedConfig: httpConnectionManagerAsAny},
-			}},
-		}},
 	}
 }
 

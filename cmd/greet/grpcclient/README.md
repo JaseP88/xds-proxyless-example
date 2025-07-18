@@ -39,10 +39,14 @@ To create the connection to gRPC server target now will reference an LDS (Listen
 ```go
 conn, err := grpc.NewClient("xds:///connect.me.to.grpcserver", grpc.WithTransportCredentials(creds))
 ```
+
 The `xds:///` prefix here will denote gRPC resolvers to connect to xDS control plane first to get the endpoint information of your gRPC server.  
+
 > info: there are other semantics gRPC supports besides xds:///
 >
-The string `connect.me.to.grpcserver` is the listener name that will start a journey from LDS->RDS->CDS->EDS (endpoint).
+
+The string `connect.me.to.grpcserver` is the listener name that will start a journey from LDS->RDS->CDS->EDS (endpoint).  
+
 ```yaml
 static_resources:
   listeners:
