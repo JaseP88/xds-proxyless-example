@@ -84,13 +84,13 @@ func main() {
 		log.Println("Press Enter to update weights")
 		reader.ReadString('\n')
 
-		log.Printf("weight for serviceA with address %s:%d", address, 50051)
 		targetWeightA, _ := reader.ReadString('\n')
 		twA, _ := strconv.Atoi(strings.Trim(targetWeightA, "\n"))
+		log.Printf("weight for Locality 1 with address %s:%d changed to %d", address, 50051, twA)
 
-		log.Printf("weight for serviceB with address %s:%d", address, 50053)
 		targetWeightB, _ := reader.ReadString('\n')
 		twB, _ := strconv.Atoi(strings.Trim(targetWeightB, "\n"))
+		log.Printf("weight for serviceB with address %s:%d changed to %d", address, 50053, twB)
 
 		newSnap := res.GenerateSnapshotClientSnapshot(strconv.Itoa(versionNum), uint32(twA), uint32(twB))
 		versionNum++

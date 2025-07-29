@@ -1,4 +1,5 @@
 This module contains the xDS server build from [envoy go-control-plane](https://github.com/envoyproxy/go-control-plane).  
+[Walkthrough](https://github.com/envoyproxy/go-control-plane/tree/main/internal/example)
   
 Configurations resources are predefined for simplicity.  
 Resources are also broken up to demo specific setups

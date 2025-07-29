@@ -4,3 +4,4 @@ go-grpc-tmpl/.vscode
 **/vendor
 prsnl-workspace.iml
 .vscode
+**.Log

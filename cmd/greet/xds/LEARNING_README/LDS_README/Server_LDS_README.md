@@ -18,7 +18,7 @@ func makeServerListener() *listener.Listener {
 			Rds: &hcm.Rds{
 				ConfigSource: &core.ConfigSource{
 					ConfigSourceSpecifier: &core.ConfigSource_Ads{
-						Ads: &core.AggregatedConfigSource{},
+						Ads: &core.AggregatedConfigSource{}, // to get through ADS
 					},
 				},
 				RouteConfigName: "local_route",
@@ -80,6 +80,13 @@ func makeServerListener() *listener.Listener {
 			},
 			Filters: []*listener.Filter{{
 				Name:       wellknown.HTTPConnectionManager,
+				// A39: if the HttpConnectionManager proto is inside an HTTP API Listener, it will look only at filters registered for the gRPC client, whereas if it is inside a TCP Listener, it will look only at filters registered for the gRPC server.
+
+				// For comparison for gRPC client
+
+				// ApiListener: &listener.ApiListener{
+				// 	ApiListener: httpConnectionManagerAsAny,
+				// },
 				ConfigType: &listener.Filter_TypedConfig{TypedConfig: httpConnectionManagerAsAny},
 			}},
 		}},

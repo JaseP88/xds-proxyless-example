@@ -135,11 +135,11 @@ func makeCluster() *cluster.Cluster {
 			},
 		},
 		ConnectTimeout:       durationpb.New(5 * time.Second),
-		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
+		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS}, // use EDS instead of static
 		EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{
 			EdsConfig: &core.ConfigSource{
 				ConfigSourceSpecifier: &core.ConfigSource_Ads{
-					Ads: &core.AggregatedConfigSource{},
+					Ads: &core.AggregatedConfigSource{}, // use ADS
 				},
 			},
 		},

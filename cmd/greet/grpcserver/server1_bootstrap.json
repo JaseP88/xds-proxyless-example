@@ -19,7 +19,19 @@
   ],
   "node": {
     "id": "server1",
-    "cluster": "backend_cluster"
+    "cluster": "backend_cluster",
+    "locality": {
+      "region": "example_region",
+      "zone": "example_zone",
+      "sub_zone": "example_sub_zone"
+    },
+    "metadata": {
+      "customKey": "value1",
+      "another": "abc",
+      "complex": {
+        "nestedKey": "nestedValue"
+      }
+    }
   },
   "server_listener_resource_name_template": "example/resource/%s",
   "certificate_providers": {

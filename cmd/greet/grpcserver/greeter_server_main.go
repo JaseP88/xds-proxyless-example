@@ -57,7 +57,7 @@ type greeterServer struct {
 
 func (s *greeterServer) SayHello(_ context.Context, request *greeter.GreetRequest) (*greeter.GreetReply, error) {
 	counter++
-	fmt.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
+	log.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
 	resp := &greeter.GreetReply{
 		Greet:     fmt.Sprintf("Hello %s!", request.Name),
 		FromServer: serverName,
@@ -68,7 +68,7 @@ func (s *greeterServer) SayHello(_ context.Context, request *greeter.GreetReques
 
 func (s *greeterServer) SayHelloInVietnamese(_ context.Context, request *greeter.GreetRequest) (*greeter.GreetReply, error) {
 	counter++
-	fmt.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
+	log.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
 	resp := &greeter.GreetReply{
 		Greet:     fmt.Sprintf("Xin Chao %s!", request.Name),
 		FromServer: serverName,

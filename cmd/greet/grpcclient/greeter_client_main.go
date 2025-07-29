@@ -19,11 +19,12 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
@@ -86,6 +87,10 @@ func main() {
 
 	client := greeter.NewGreeterClient(conn)
 
+	reader := bufio.NewReader(os.Stdin)
+	log.Println("Press Enter to start sending greetings...")
+	reader.ReadString('\n')
+
 	counter := 0
 	for i := 0; i < int(transactionCount); i++ {
 		counter++
@@ -97,7 +102,7 @@ func main() {
 
 		// res, _ := client.SayHello(context.Background(), req)
 		res, _ := client.SayHelloInVietnamese(context.Background(), req)
-		fmt.Printf("got res: %v", res)
+		log.Printf("got res: %v", res)
 
 		time.Sleep(100 * time.Millisecond)
 	}
