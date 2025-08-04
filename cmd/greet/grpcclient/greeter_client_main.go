@@ -42,6 +42,7 @@ var (
 	xdsCreds         bool
 	transactionCount int64
 	clientName       string
+	simple           bool
 )
 
 var names = []string{
@@ -62,6 +63,7 @@ func init() {
 	flag.StringVar(&clientName, "c", "client123", "client name")
 	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
 	flag.Int64Var(&transactionCount, "tc", 1000, "number of transactions to send")
+	flag.BoolVar(&simple, "simple", false, "whether to use simple or complex setup, with or without grpc server resources")
 }
 
 func main() {
@@ -72,7 +74,7 @@ func main() {
 	}
 
 	creds := insecure.NewCredentials()
-	if xdsCreds {
+	if xdsCreds && !simple {
 		log.Println("Using xDS credentials...")
 		var err error
 		if creds, err = xdscreds.NewClientCredentials(xdscreds.ClientOptions{FallbackCreds: insecure.NewCredentials()}); err != nil {
@@ -100,8 +102,8 @@ func main() {
 			TransactionCounter: int64(counter),
 		}
 
-		// res, _ := client.SayHello(context.Background(), req)
-		res, _ := client.SayHelloInVietnamese(context.Background(), req)
+		res, _ := client.SayHello(context.Background(), req)
+		// res, _ := client.SayHelloInVietnamese(context.Background(), req)
 		log.Printf("got res: %v", res)
 
 		time.Sleep(100 * time.Millisecond)

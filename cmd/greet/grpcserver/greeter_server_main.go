@@ -27,6 +27,7 @@ import (
 
 	"github.com/JaseP88/xds-poc/api/greeter"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"
 
 	"google.golang.org/grpc/credentials/insecure"
@@ -42,6 +43,7 @@ var (
 	xdsCreds   bool
 	serverName string
 	counter    = 0
+	simple     bool
 )
 
 func init() {
@@ -49,6 +51,7 @@ func init() {
 	flag.IntVar(&port, "p", 50051, "the port to serve Greeter service requests on. Health service will be served on `port+1`")
 	flag.BoolVar(&xdsCreds, "xds_creds", true, "whether the server should use xDS APIs to receive security configuration")
 	flag.StringVar(&serverName, "n", "server_A", "server name")
+	flag.BoolVar(&simple, "simple", false, "whether to use simple or complex setup, with or without grpc server resources")
 }
 
 type greeterServer struct {
@@ -59,9 +62,9 @@ func (s *greeterServer) SayHello(_ context.Context, request *greeter.GreetReques
 	counter++
 	log.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
 	resp := &greeter.GreetReply{
-		Greet:     fmt.Sprintf("Hello %s!", request.Name),
+		Greet:      fmt.Sprintf("Hello %s!", request.Name),
 		FromServer: serverName,
-		ToClient: request.FromClient,
+		ToClient:   request.FromClient,
 	}
 	return resp, nil
 }
@@ -70,9 +73,9 @@ func (s *greeterServer) SayHelloInVietnamese(_ context.Context, request *greeter
 	counter++
 	log.Printf("Received rpc request %v, with distribution: %f %%", request, float64(counter)/float64(request.TransactionCounter)*100)
 	resp := &greeter.GreetReply{
-		Greet:     fmt.Sprintf("Xin Chao %s!", request.Name),
+		Greet:      fmt.Sprintf("Xin Chao %s!", request.Name),
 		FromServer: serverName,
-		ToClient: request.FromClient,
+		ToClient:   request.FromClient,
 	}
 	return resp, nil
 }
@@ -88,20 +91,39 @@ func main() {
 		}
 	}
 
+	startupService(creds)
+	startupHealthService()
+}
+
+func startupService(creds credentials.TransportCredentials) {
 	greeterAddy := fmt.Sprintf("%s:%d", address, port)
 	greeterLis, err := net.Listen("tcp4", greeterAddy)
 	if err != nil {
 		log.Fatalf("net.Listen(tcp4, %q) failed: %v", greeterAddy, err)
 	}
 
-	// xdsclient within server
-	greeterService, err := xds.NewGRPCServer(grpc.Creds(creds))
-	// as := grpc.NewServer(grpc.Creds(creds))
-	if err != nil {
-		log.Fatalf("Failed to create an Greeter gRPC server: %v", err)
-	}
-	greeter.RegisterGreeterServer(greeterService, &greeterServer{})
+	if !simple {
+		greeterService, err := xds.NewGRPCServer(grpc.Creds(creds))
+		if err != nil {
+			log.Fatalf("Failed to create an Greeter gRPC server: %v", err)
+		}
+		greeter.RegisterGreeterServer(greeterService, &greeterServer{})
 
+		go func() {
+			greeterService.Serve(greeterLis)
+		}()
+	} else {
+		greeterService := grpc.NewServer(grpc.Creds(creds))
+		greeter.RegisterGreeterServer(greeterService, &greeterServer{})
+
+		go func() {
+			greeterService.Serve(greeterLis)
+		}()
+	}
+	log.Printf("Serving GreeterService on %s", greeterLis.Addr().String())
+}
+
+func startupHealthService() {
 	healthAddy := fmt.Sprintf("%s:%d", address, port+1)
 	healthLis, err := net.Listen("tcp4", healthAddy)
 	if err != nil {
@@ -112,9 +134,6 @@ func main() {
 	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
 	healthgrpc.RegisterHealthServer(hs, healthServer)
 
-	log.Printf("Serving GreeterService on %s and HealthService on %s", greeterLis.Addr().String(), healthLis.Addr().String())
-	go func() {
-		greeterService.Serve(greeterLis)
-	}()
 	hs.Serve(healthLis)
+	log.Printf("Serving HealthService on %s", healthLis.Addr().String())
 }
